@@ -8,38 +8,33 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-    res.send('<h2>welcome user</h2>');
+    res.status(200).send('Welcome');
 })
 
 
 var grades = [
     {
-        name: 'Churros',
-        class: 'A',
-        grade: 8
+        item: "milk",
+        quantity: 1
     },
     {
-        name: 'Shoyou',
-        class: 'B',
-        grade: 6
+        item: "cereal",
+        quantity: 2
     },
     {
-        name: 'Bela',
-        class: 'C',
-        grade: 9
-
+        item: 'lettuce',
+        quantity: 1
     }
 ]
 
 
-app.get("/grades", (req, res) => {
-    res.send(grades)
+app.get("/groceries", (req, res) => {
+    res.status(200).send(grades)
 });
 
-app.post('/grades', (req, res) => {
+app.post('/groceries', (req, res) => {
     grades = [...grades, req.body]
-    res.statusCode = 201
-    res.send('Postado com sucesso');
+    res.status(201).send('Postado com sucesso');
 })
 
 app.listen(PORT, () => {
