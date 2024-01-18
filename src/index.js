@@ -1,43 +1,49 @@
 const express = require("express");
 const app = express();
-const PORT = 3333;
+
+const PORT = process.env.PORT || 3333;
 
 app.use(
-    express.json(),
-    express.urlencoded(),
-);
+    express.json()
+)
 
-app.get("/", (req, res) => {
-    res.status(200).send('Welcome');
-})
-
-
-var grades = [
-    {
-        item: "milk",
-        quantity: 1
-    },
-    {
-        item: "cereal",
-        quantity: 2
-    },
-    {
-        item: 'lettuce',
-        quantity: 1
-    }
+var users = [
+    { id: 1, username: "Churros", displayName: "Churros" },
+    { id: 2, username: "Shoyou", displayName: "Shoyou" },
+    { id: 3, username: "Guilherme", displayName: "Guilherme" }
 ]
 
-
-app.get("/groceries", (req, res) => {
-    res.status(200).send(grades)
-});
-
-app.post('/groceries', (req, res) => {
-    grades = [...grades, req.body]
-    res.status(201).send('Postado com sucesso');
+app.get("/", (req, res) => {
+    res.status(200).send("Welcome");
 })
 
+app.get("/api/users", (req, res) => {
+    res.status(200).send(users);
+})
+
+app.get("api/users/:id", (req, res) => {
+    console.log(req.params);
+    res.send(200);
+})
+
+app.get('/api/products', (req, res, next) => {
+    res.status(200).send("Products");
+    next();
+}, (req, res) => {
+    console.log("After returning the products to the client side");
+});
+
+app.post('/api/users', (req, res, next) => {
+    console.log("Before handling the request");
+    next();
+}, (req, res, next) => {
+    console.log(req.body);
+    users = [...users, req.body]
+    res.status(201).send('Postado com sucesso');
+    next();
+});
+
 app.listen(PORT, () => {
-    console.log(`Express server running on port ${PORT}`);
+    console.log(`server running on port ${PORT}`);
 })
 
