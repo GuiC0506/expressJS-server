@@ -21,9 +21,11 @@ app.get("/api/users", (req, res) => {
     res.status(200).send(users);
 })
 
-app.get("api/users/:id", (req, res) => {
-    console.log(req.params);
-    res.send(200);
+app.get("/api/users/:id", (req, res) => {
+    const userId = req.params.id;
+    const userInfo = users.find(user => user.id == userId);
+    console.log(userInfo);
+    res.status(200).send(userInfo);
 })
 
 app.get('/api/products', (req, res, next) => {
