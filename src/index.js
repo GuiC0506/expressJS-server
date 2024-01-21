@@ -2,6 +2,16 @@ const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 3333;
 
+const validataUserExistence = (req, res, next) => {
+    const userId = parseInt(req.params.id);
+    if(isNaN(userId)) return res.status(400).send("Bad Request");
+
+    const userIndex = users.findIndex(user => user.id === userId);
+    if(userIndex === -1) return res.status(404).send("Not Found");
+    req.userIndex = userIndex;
+    next();
+}
+
 app.use(
     express.json()
 )
@@ -43,13 +53,9 @@ app.post("/api/users", (req, res) => {
 })
 
 // updates the whole resource, given a specific ID. Overwrites the resource
-app.put("/api/users/:id", (req, res) => {
-    const userId = parseInt(req.params.id);
-    if(isNaN(userId)) return res.status(400).send("Bad Request");
-
-    const userIndex = users.findIndex(user => user.id === userId);
-    if(userIndex === -1) return res.status(404).send("Not Found");
-    users[userIndex] = { id: userId, ...req.body};
+app.put("/api/users/:id", validataUserExistence, (req, res) => {
+    const { userIndex } = req;
+    users[userIndex] = { id: users[userIndex].id, ...req.body};
     return res.sendStatus(204);
 })
 
