@@ -19,7 +19,6 @@ app.get("/", (req, res) => {
 
 app.get("/api/users", (req, res) => {
     const { query: { filter, value } } = req;
-    console.log(filter, value);
     if(!filter && !value) return res.send(users);
     if(filter && value) {
         const filteredusers = users.filter(user => user[filter].includes(value));
@@ -44,15 +43,11 @@ app.get('/api/products', (req, res, next) => {
     console.log("After returning the products to the client side");
 });
 
-app.post('/api/users', (req, res, next) => {
-    console.log("Before handling the request");
-    next();
-}, (req, res, next) => {
-    console.log(req.body);
-    users = [...users, req.body]
-    res.status(201).send('Postado com sucesso');
-    next();
-});
+app.post("/api/users", (req, res) => {
+    req.body = {...req.body, id: users.at(users.length - 1).id + 1}
+    users.push(req.body);
+    res.status(201).send(users.at(users.length - 1));
+})
 
 app.listen(PORT, () => {
     console.log(`server running on port ${PORT}`);
