@@ -37,7 +37,7 @@ app.get("/api/users/:id", (req, res) => {
 
 // creates a new resource
 app.post("/api/users", (req, res) => {
-    req.body = {...req.body, id: users.at(users.length - 1).id + 1}
+    req.body = { id: users.at(users.length - 1).id + 1, ...req.body }
     users.push(req.body);
     res.status(201).send(users.at(users.length - 1));
 })
@@ -63,6 +63,17 @@ app.patch("/api/users/:id", (req, res) => {
 
     users[userIndex] = { ...users[userIndex], ...req.body };
     return res.sendStatus(204);
+})
+
+// deletes a specific resource, given a ID
+app.delete("/api/users/:id", (req, res) => {
+    const userId = parseInt(req.params.id);
+    if(isNaN(userId)) return res.status(400).send("Bad Request");
+    const userIndex = users.findIndex(user => user.id === userId);
+
+    if(userIndex === -1) return res.status(404).send("Not Found");
+    users.splice(userIndex, 1);
+    return res.sendStatus(200);
 })
 
 app.listen(PORT, () => {
