@@ -21,7 +21,7 @@ app.get("/api/users", (req, res) => {
     const { query: { filter, value } } = req;
     if(!filter && !value) return res.send(users);
     if(filter && value) {
-        const filteredusers = users.filter(user => user[filter].includes(value));
+        const filteredusers = users.filter(user => user[filter].toLowerCase().includes(value.toLowerCase()));
         res.send(filteredusers)
     }
 
@@ -50,6 +50,18 @@ app.put("/api/users/:id", (req, res) => {
     const userIndex = users.findIndex(user => user.id === userId);
     if(userIndex === -1) return res.status(404).send("Not Found");
     users[userIndex] = { id: userId, ...req.body};
+    return res.sendStatus(204);
+})
+
+
+// updates a resource partially. For example, a single field of a object.
+app.patch("/api/users/:id", (req, res) => {
+    const userId = parseInt(req.params.id);
+    if(isNaN(userId)) return res.status(400).send("Bad request.");
+    const userIndex = users.findIndex(user => user.id === userId);
+    if(userIndex === -1) return res.status(404).send("Not Found");
+
+    users[userIndex] = { ...users[userIndex], ...req.body };
     return res.sendStatus(204);
 })
 
