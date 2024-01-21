@@ -18,15 +18,24 @@ app.get("/", (req, res) => {
 })
 
 app.get("/api/users", (req, res) => {
-    res.status(200).send(users);
+    const { query: { filter, value } } = req;
+    console.log(filter, value);
+    if(!filter && !value) return res.send(users);
+    if(filter && value) {
+        const filteredusers = users.filter(user => user[filter].includes(value));
+        res.send(filteredusers)
+    }
+
+    return res.send(users);
 })
 
 app.get("/api/users/:id", (req, res) => {
-    const userId = req.params.id;
+    const userId = parseInt(req.params.id);
     const userInfo = users.find(user => user.id == userId);
-    console.log(userInfo);
+    if(isNaN(userId)) return res.status(400).send( { msg: "Bad request. Invalid ID" });
     res.status(200).send(userInfo);
 })
+
 
 app.get('/api/products', (req, res, next) => {
     res.status(200).send("Products");
