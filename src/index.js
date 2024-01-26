@@ -1,6 +1,8 @@
 const express = require("express");
 const { query, body, validationResult, matchedData, checkSchema } = require("express-validator");
 const userCreationSchema = require("./utils/validationSchemas");
+const { userRoutes } = require('./routes/users');
+const { users } = require('./utils/constants');
 
 const app = express();
 const PORT = process.env.PORT || 3333;
@@ -16,35 +18,14 @@ const validateUserExistence = (req, res, next) => {
 }
 
 app.use(
-    express.json()
+    express.json(),
+    // register router
+    userRoutes
 )
 
-var users = [
-    { id: 1, username: "Churros", displayName: "Churros" },
-    { id: 2, username: "Shoyou", displayName: "Shoyou" },
-    { id: 3, username: "Guilherme", displayName: "Guilherme" }
-]
 
 app.get("/", (req, res) => {
     res.status(200).send("Welcome");
-})
-
-// get a specific resource
-app.get("/api/users", 
-    query(["filter", "value"]).
-    isString()
-    .notEmpty().withMessage("Field cannot be empty.")
-    .isLength({ min: 3, max: 15}).withMessage("Field bust be at least 3-10"),
-    (req, res) => {
-        const result = validationResult(req);
-        console.log(result);
-        const { query: { filter, value } } = req;
-        if(!filter && !value) return res.send(users);
-        if(filter && value) {
-            const filteredusers = users.filter(user => user[filter].toLowerCase().includes(value.toLowerCase()));
-            return res.send(filteredusers)
-    }
-    return res.send(users);
 })
 
 app.get("/api/users/:id", (req, res) => {
