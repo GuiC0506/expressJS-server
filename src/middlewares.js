@@ -11,4 +11,13 @@ const validateUserExistence = (req, res, next) => {
     next();
 }
 
-module.exports = { validateUserExistence };
+const requestLogger = (req, res, next) => {
+    const requestMsg = {
+        method: req.method,
+        url: req.url
+    };
+    console.log(`${requestMsg.method} - ${requestMsg.url}`);
+    next();
+}
+
+module.exports = { validateUserExistence, requestLogger };

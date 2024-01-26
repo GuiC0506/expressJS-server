@@ -1,14 +1,15 @@
 const { Router } = require('express');
 const  { query, validationResult, checkSchema, matchedData } = require('express-validator');
 const { users } = require("../utils/constants");
-const { validateUserExistence } = require("../middlewares");
+const { validateUserExistence, requestLogger } = require("../middlewares");
 const { userCreationSchema } = require("../utils/validationSchemas");
 
-// mini routerlication to group endpoints of a domain
+// mini router aplication to group endpoints of a domain
 const router = Router();
 
 // get a specific resource
 router.get("/api/users",
+    query(["filter", "value"]),
     (req, res) => {
         const { query: { filter, value } } = req;
         if(!filter && !value) return res.send(users);
@@ -64,6 +65,5 @@ router.delete("/api/users/:id", validateUserExistence, (req, res) => {
     users.splice(userIndex, 1);
     return res.sendStatus(200);
 })
-
 
 module.exports.userRoutes = router;
