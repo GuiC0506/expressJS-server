@@ -21,4 +21,23 @@ const userCreationSchema = {
     }
 }
 
-module.exports = userCreationSchema;
+const userQueryParamsSchema = {
+    filter: {
+        isString: true,
+        notEmpty: {
+            errorMessage: "Field can not be empty."
+        },
+        isLength: {
+            options: {
+                min: 3,
+                max: 15
+            },
+            errorMessage: "Field must be at least 3-10 characters"
+        }
+    }
+}
+
+module.exports = {
+    userCreationSchema,
+    userQueryParamsSchema
+};
