@@ -21,6 +21,14 @@ router.get("/api/users",
 })
 
 router.get("/api/users/:id", validateUserExistence, (req, res) => {
+    // getting cookie from the client
+    const cookies = req.cookies; // parsed by cookie parser
+    console.log(req.signedCookies);
+    // req.cookies: unsigned cookies
+    console.log(req.cookies);
+    if(!req.signedCookies.data) {
+        return res.status(403).send("You need the correct cookie");
+    }
     const { userId } = req;
     const userInfo = users.find(user => user.id == userId);
     res.status(200).send(userInfo);
