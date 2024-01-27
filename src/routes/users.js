@@ -75,4 +75,46 @@ router.delete("/api/users/:id", validateUserExistence, (req, res) => {
     return res.sendStatus(200);
 })
 
+router.post("/api/auth", (req, res) => {
+    const { body: { username, password } } = req;
+    const findUser = users.find(user => (user.password === password) && (user.username === username));
+    if(!findUser) {
+        return res.status(401).send({msg: "Bad Credentials"})
+    }
+    req.session.user = findUser;
+    res.status(200).send(findUser);
+})
+
+router.get("/api/auth/status", (req, res) => {
+    req.sessionStore.get(req.sessionID, (err, session) => {
+        console.log(session);
+        console.log(req.sessionID);
+    });
+    if(!req.session.user) {
+        return res.status(401).send("Not authenticated")
+    }
+    res.status(200).send(req.session.user);
+})
+
+router.post("/api/cart", (req, res) => {
+    if(!req.session.user) return res.sendStatus(401);
+    const { body: item } = req;
+
+    const { cart } = req.session;
+    if(cart) {
+        cart.push(item)
+    } else {
+        req.session.cart = [item];
+    }
+
+    return res.status(200).send(item);
+
+})
+
+router.get("/api/cart", (req, res) => {
+    if(!req.session.user) return res.sendStatus(401);
+    return res.status(200).send(req.session.cart ?? []);
+
+})
+
 module.exports.userRoutes = router;
