@@ -11,6 +11,7 @@ const router = Router();
 router.get("/api/users",
     query(["filter", "value"]),
     (req, res) => {
+        console.log(req.sessionID, "id");
         const { query: { filter, value } } = req;
         if(!filter && !value) return res.send(users);
         if(filter && value) {
