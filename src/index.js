@@ -3,6 +3,7 @@ const { router } = require("./routes/index");
 const { requestLogger } = require("./middlewares");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
+const passport = require("passport");
 
 const app = express();
 const PORT = process.env.PORT || 3333;
@@ -15,9 +16,11 @@ app.use(
         saveUninitialized: false,
         resave: false,
         cookie: {
-            maxAge: 60000 * 60
+            maxAge: 10000
         }
     }),
+    passport.initialize(),
+    passport.session(),
     router
 )
 
@@ -26,7 +29,6 @@ app.get("/", (req, res) => {
     // basically, sets the cookie with the session ID
     // the req obj always contains the object of the session it was requested.
     res.cookie("data", "hello", { maxAge: 10000, signed: true })
-    req.session.test = "x;"
     res.status(200).send("Welcome");
 })
 
