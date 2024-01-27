@@ -3,6 +3,8 @@ const  { query, validationResult, checkSchema, matchedData } = require('express-
 const { users } = require("../utils/constants");
 const { validateUserExistence, requestLogger } = require("../middlewares");
 const { userCreationSchema } = require("../utils/validationSchemas");
+const passport = require('passport');
+const _ = require("../strategies/local-strategy");
 
 // mini router aplication to group endpoints of a domain
 const router = Router();
@@ -75,7 +77,7 @@ router.delete("/api/users/:id", validateUserExistence, (req, res) => {
     return res.sendStatus(200);
 })
 
-router.post("/api/auth", (req, res) => {
+/*router.post("/api/auth", (req, res) => {
     const { body: { username, password } } = req;
     const findUser = users.find(user => (user.password === password) && (user.username === username));
     if(!findUser) {
@@ -83,17 +85,30 @@ router.post("/api/auth", (req, res) => {
     }
     req.session.user = findUser;
     res.status(200).send(findUser);
+})*/
+
+router.post("/api/auth", passport.authenticate("local"), (req, res) => {
+    res.sendStatus(200);
+})
+
+router.post("/api/auth/logout", (req, res) => {
+    if(!req.user) return res.status(401).send("You have not made the login yet.");
+    req.logout((err) => {
+        if(err) return res.sendStatus(400);
+        res.sendStatus(200);
+    })
 })
 
 router.get("/api/auth/status", (req, res) => {
+    console.log(req.session)
     req.sessionStore.get(req.sessionID, (err, session) => {
         console.log(session);
         console.log(req.sessionID);
     });
-    if(!req.session.user) {
+    if(!req.user) {
         return res.status(401).send("Not authenticated")
     }
-    res.status(200).send(req.session.user);
+    res.status(200).send(req.user);
 })
 
 router.post("/api/cart", (req, res) => {
