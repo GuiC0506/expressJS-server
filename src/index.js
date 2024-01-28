@@ -1,6 +1,6 @@
 const express = require("express");
 const { router } = require("./routes/index");
-const { requestLogger } = require("./middlewares");
+const { requestLogger, checkAuthentication } = require("./middlewares");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const passport = require("passport");
@@ -26,7 +26,7 @@ app.use(
     router
 )
 
-app.get("/", (req, res) => {
+app.get("/", checkAuthentication, (req, res) => {
     // modifing the session obj, makes express not creating a brand new session obj in every req. Keeps track of the first one
     // basically, sets the cookie with the session ID
     // the req obj always contains the object of the session it was requested.

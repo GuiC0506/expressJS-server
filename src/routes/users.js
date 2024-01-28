@@ -23,12 +23,16 @@ router.get("/api/users/:id",
     async (req, res) => {
     const userId = req.params.id;
     try {
-        const { rows: user } = await pool.query(`
+        const data = await pool.query(`
             select * from users u where u.id = $1
          `, [userId]);
-        res.status(200).send(user)
+        if(data.rowCount) {
+            res.status(200).send(data.rows[0]);
+        } else {
+            throw new Error("User not found");
+        }
     } catch(err) {
-        res.sendStatus(401).send({msg: err});
+        res.status(401).send({msg: err.message});
     }
 })
 
@@ -85,31 +89,6 @@ router.delete("/api/users/:id", validateUserExistence, (req, res) => {
     req.session.user = findUser;
     res.status(200).send(findUser);
 })*/
-
-router.post("/api/login", passport.authenticate("local"), 
-    (req, res) => {
-    res.sendStatus(200);
-})
-
-router.post("/api/auth/logout", (req, res) => {
-    if(!req.user) return res.status(401).send("You have not made the login yet.");
-    req.logout((err) => {
-        if(err) return res.sendStatus(400);
-        res.sendStatus(200);
-    })
-})
-
-router.get("/api/auth/status", (req, res) => {
-    console.log(req.session)
-    req.sessionStore.get(req.sessionID, (err, session) => {
-        console.log(session);
-        console.log(req.sessionID);
-    });
-    if(!req.user) {
-        return res.status(401).send("Not authenticated")
-    }
-    res.status(200).send(req.user);
-})
 
 router.post("/api/cart", (req, res) => {
     if(!req.session.user) return res.sendStatus(401);
