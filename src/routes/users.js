@@ -35,34 +35,29 @@ router.get("/api/users/:id",
         res.status(401).send({msg: err.message});
     }
 })
-
-// creates a new resource
-router.post("/api/users",
-    checkAuthentication,
-    checkSchema(userCreationSchema), // body schema validation
-    async (req, res) => {
-        const validation = validationResult(req);
-        if(!validation.isEmpty()) {
-            return res.status(400).send({ error: validation.array() });
-        }
-        
-        const data = matchedData(req);
-        const { username, displayName, password } = data;
-        const result = await pool.query(`
-            insert into users (name, display_name, password)
-            values ($1, $2, $3);
-            `, [username, displayName, password]);
-        res.status(201).send(result);
-})
-
 // updates the whole resource, given a specific ID. Overwrites the resource
 router.put("/api/users/:id",
-    validateUserExistence,
+    checkAuthentication,
     checkSchema(userCreationSchema),
-    (req, res) => {
-    const { userIndex } = req;
-    users[userIndex] = { id: users[userIndex].id, ...req.body};
-    return res.sendStatus(204);
+    async (req, res) => {
+    const { id: userId } = req.params;
+    const { username, displayName, password } = req.body;
+    try {
+        const { rowCount } = await pool.query(`select * from users u where u.id = $1 `, [userId]);
+        if(!rowCount) return res.status(404).json({error: `User with ID ${userId} not found`});
+        const result = await pool.query(`
+            update users set
+                name = $1,
+                display_name = $2,
+                password = $3
+            where id = $4;
+            `, [username, displayName, password, userId]);
+        const newUser = await pool.query(`select * from users where id = $1`, [userId]);
+        console.log(newUser);
+        return res.status(200).send(`User was updated\n${newUser.rows[0].toString()}`);
+    } catch(err) {
+        return res.status(400).json({error: err.message});
+    }
 })
 
 
@@ -79,16 +74,6 @@ router.delete("/api/users/:id", validateUserExistence, (req, res) => {
     users.splice(userIndex, 1);
     return res.sendStatus(200);
 })
-
-/*router.post("/api/auth", (req, res) => {
-    const { body: { username, password } } = req;
-    const findUser = users.find(user => (user.password === password) && (user.username === username));
-    if(!findUser) {
-        return res.status(401).send({msg: "Bad Credentials"})
-    }
-    req.session.user = findUser;
-    res.status(200).send(findUser);
-})*/
 
 router.post("/api/cart", (req, res) => {
     if(!req.session.user) return res.sendStatus(401);
