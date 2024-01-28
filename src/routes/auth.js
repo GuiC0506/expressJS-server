@@ -10,7 +10,7 @@ const router = Router();
 
 router.post("/api/login", passport.authenticate("local"), 
     (req, res) => {
-    res.sendStatus(200);
+    res.status(200).send("You have logged in!");
 })
 
 router.post("/api/register", 

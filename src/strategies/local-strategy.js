@@ -13,7 +13,7 @@ passport.use(
                                     );
             done(null, result.rows[0]); // calls the serializeUser function
         } catch(err) {
-            done(err, null);
+            done(err, null, {message: "Not possible to authenticate"});
         }
     })
 )
