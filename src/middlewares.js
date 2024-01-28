@@ -16,7 +16,7 @@ const requestLogger = (req, res, next) => {
         method: req.method,
         url: req.url
     };
-    console.log(`${requestMsg.method} - ${requestMsg.url}`);
+    console.log(`${requestMsg.method} - ${requestMsg.url} ${req.user?? ""}`);
     next();
 }
 

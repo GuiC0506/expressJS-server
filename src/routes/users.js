@@ -61,7 +61,7 @@ router.put("/api/users/:id",
     checkSchema(userCreationSchema),
     (req, res) => {
     const { userIndex } = req;
-    users[userIndex] = { id: users[userIndex].id, ...req.body};
+        users[userIndex] = { id: users[userIndex].id, ...req.body};
     return res.sendStatus(204);
 })
 
@@ -79,16 +79,6 @@ router.delete("/api/users/:id", validateUserExistence, (req, res) => {
     users.splice(userIndex, 1);
     return res.sendStatus(200);
 })
-
-/*router.post("/api/auth", (req, res) => {
-    const { body: { username, password } } = req;
-    const findUser = users.find(user => (user.password === password) && (user.username === username));
-    if(!findUser) {
-        return res.status(401).send({msg: "Bad Credentials"})
-    }
-    req.session.user = findUser;
-    res.status(200).send(findUser);
-})*/
 
 router.post("/api/cart", (req, res) => {
     if(!req.session.user) return res.sendStatus(401);

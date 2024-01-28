@@ -11,13 +11,9 @@ passport.use(
                                         where u.name = $1 and u.password = $2`,
                                         [username, password]
                                     );
-            if(!result.rowCount) {
-                throw new Error("Bad credentials");
-            } else {
-                done(null, result.rows[0]); // calls the serializeUser function
-            }
+            done(null, result.rows[0]); // calls the serializeUser function
         } catch(err) {
-            done(err, null, {message: err.message.error});
+            done(err, null);
         }
     })
 )
