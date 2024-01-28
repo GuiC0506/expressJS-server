@@ -21,7 +21,7 @@ const requestLogger = (req, res, next) => {
 }
 
 const checkAuthentication = (req, res, next) => {
-    return req.user ? next() : res.sendStatus(401);
+    return req.isAuthenticated() ? next() : res.sendStatus(401);
 }
 
 module.exports = { validateUserExistence, requestLogger, checkAuthentication };

@@ -1,6 +1,7 @@
 const { Router } = require("express")
 const  { query, validationResult, checkSchema, matchedData } = require('express-validator');
 const { userCreationSchema } = require("../utils/validationSchemas");
+const { hashPassword } = require("../utils/helpers");
 const passport = require('passport');
 const _ = require("../strategies/local-strategy");
 const pool = require("../database/db");
@@ -24,12 +25,13 @@ router.post("/api/register",
             }
             return res.status(400).send(erroMsg);
         }
-        const { username, displayName, password } = matchedData(req);
+        const data = matchedData(req);
+        data.password = await hashPassword(data.password);
         try {
             const insertResult = await pool.query(`
                     insert into users (name, display_name, password)
                     values ($1, $2, $3)
-                `, [username, displayName, password]);
+                `, [data.username, data.displayName, data.password]);
             res.sendStatus(200);
         } catch(err) {
             res.status(400).send(err.message);
@@ -38,7 +40,7 @@ router.post("/api/register",
 )
 
 router.post("/api/auth/logout", (req, res) => {
-    if(!req.user) return res.status(401).send("You have not made the login yet.");
+    if(!req.isAuthenticated()) return res.status(401).send("You have not made the login yet.");
     req.logout((err) => {
         if(err) return res.sendStatus(400);
         res.sendStatus(200);

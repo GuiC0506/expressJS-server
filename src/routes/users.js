@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const  { query, validationResult, checkSchema, matchedData } = require('express-validator');
+const  { query, validationResult, checkSchema, matchedData, check } = require('express-validator');
 const { users } = require("../utils/constants");
 const { validateUserExistence, requestLogger, checkAuthentication } = require("../middlewares");
 const { userCreationSchema } = require("../utils/validationSchemas");
@@ -52,9 +52,7 @@ router.put("/api/users/:id",
                 password = $3
             where id = $4;
             `, [username, displayName, password, userId]);
-        const newUser = await pool.query(`select * from users where id = $1`, [userId]);
-        console.log(newUser);
-        return res.status(200).send(`User was updated\n${newUser.rows[0].toString()}`);
+        return res.status(200).send(`User was updated`);
     } catch(err) {
         return res.status(400).json({error: err.message});
     }
@@ -62,7 +60,9 @@ router.put("/api/users/:id",
 
 
 // updates a resource partially. For example, a single field of a object.
-router.patch("/api/users/:id", validateUserExistence, (req, res) => {
+router.patch("/api/users/:id",
+    checkAuthentication,
+    (req, res) => {
     const { userIndex } = req;
     users[userIndex] = { ...users[userIndex], ...req.body };
     return res.sendStatus(204);
