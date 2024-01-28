@@ -1,19 +1,23 @@
 const passport = require("passport");
 const { Strategy } = require("passport-local");
-const { users } = require("../utils/constants");
+const pool = require("../database/db");
 
 passport.use(
     // called in every post request that handles authentication
     // for verifing if a user exists
-    new Strategy((username, password, done) => {
-        console.log("Validating user credentials");
+    new Strategy(async (username, password, done) => {
         try {
-            const findUser = users.find(user => user.username === username);
-            if(!findUser) throw new Error("User not found.");
-            if(!findUser.password === password) throw new Error("Invalid credentials");
-            done(null, findUser); // calls the serializeUser function
+            const result = await pool.query(`select * from users u 
+                                        where u.name = $1 and u.password = $2`,
+                                        [username, password]
+                                    );
+            if(!result.rowCount) {
+                throw new Error("Bad credentials");
+            } else {
+                done(null, result.rows[0]); // calls the serializeUser function
+            }
         } catch(err) {
-            done(err, null)
+            done(err, null, {message: err.message.error});
         }
     })
 )

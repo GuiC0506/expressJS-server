@@ -18,6 +18,19 @@ const userCreationSchema = {
             },
             errorMessage: "Field must be min 3 and max 20 characters."
         }
+    },
+    password: {
+        isString: true,
+        notEmpty: {
+            errorMessage: "Field can not be empty."
+        },
+        isLength: {
+            options: {
+                min: 10,
+                max: 20
+            },
+            errorMessage: "Field must be min 10 and max 20 characters."
+        }
     }
 }
 
