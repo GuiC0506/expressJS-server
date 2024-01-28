@@ -4,10 +4,12 @@ const { requestLogger } = require("./middlewares");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const passport = require("passport");
+const cors = require("cors");
 
 const app = express();
 const PORT = process.env.PORT || 3333;
 app.use(
+    cors(),
     express.json(),
     requestLogger, 
     cookieParser("secret"),
@@ -16,7 +18,7 @@ app.use(
         saveUninitialized: false,
         resave: false,
         cookie: {
-            maxAge: 10000
+            maxAge: 60000 * 60
         }
     }),
     passport.initialize(),

@@ -1,55 +1,54 @@
 const { Router } = require('express');
 const  { query, validationResult, checkSchema, matchedData } = require('express-validator');
 const { users } = require("../utils/constants");
-const { validateUserExistence, requestLogger } = require("../middlewares");
+const { validateUserExistence, requestLogger, checkAuthentication } = require("../middlewares");
 const { userCreationSchema } = require("../utils/validationSchemas");
 const passport = require('passport');
 const _ = require("../strategies/local-strategy");
+const pool = require("../database/db");
 
 // mini router aplication to group endpoints of a domain
 const router = Router();
 
 // get a specific resource
 router.get("/api/users",
-    query(["filter", "value"]),
-    (req, res) => {
-        console.log(req.sessionID, "id");
-        const { query: { filter, value } } = req;
-        if(!filter && !value) return res.send(users);
-        if(filter && value) {
-            const filteredusers = users.filter(user => user[filter].toLowerCase().includes(value.toLowerCase()));
-            return res.send(filteredusers)
-    }
-    return res.send(users);
-})
+    checkAuthentication,
+    async (req, res) => {
+        const { rows } = await pool.query(`select * from users;`);
+        return res.status(200).json(rows);
+});
 
-router.get("/api/users/:id", validateUserExistence, (req, res) => {
-    // getting cookie from the client
-    const cookies = req.cookies; // parsed by cookie parser
-    console.log(req.signedCookies);
-    // req.cookies: unsigned cookies
-    console.log(req.cookies);
-    if(!req.signedCookies.data) {
-        return res.status(403).send("You need the correct cookie");
+router.get("/api/users/:id",
+    checkAuthentication,
+    async (req, res) => {
+    const userId = req.params.id;
+    try {
+        const { rows: user } = await pool.query(`
+            select * from users u where u.id = $1
+         `, [userId]);
+        res.status(200).send(user)
+    } catch(err) {
+        res.sendStatus(401).send({msg: err});
     }
-    const { userId } = req;
-    const userInfo = users.find(user => user.id == userId);
-    res.status(200).send(userInfo);
 })
 
 // creates a new resource
-router.post("/api/users", 
-    checkSchema(userCreationSchema) // body schema validation
-    ,(req, res) => {
-    const validation = validationResult(req);
-    if(!validation.isEmpty()) {
-        return res.status(400).send({ error: validation.array() });
-    }
-    
-    const data = matchedData(req);
-    const newUser = { id: users.at(users.length - 1).id + 1, ...data }
-    users.push(newUser);
-    res.status(201).send(users.at(users.length - 1));
+router.post("/api/users",
+    checkAuthentication,
+    checkSchema(userCreationSchema), // body schema validation
+    async (req, res) => {
+        const validation = validationResult(req);
+        if(!validation.isEmpty()) {
+            return res.status(400).send({ error: validation.array() });
+        }
+        
+        const data = matchedData(req);
+        const { username, displayName, password } = data;
+        const result = await pool.query(`
+            insert into users (name, display_name, password)
+            values ($1, $2, $3);
+            `, [username, displayName, password]);
+        res.status(201).send(result);
 })
 
 // updates the whole resource, given a specific ID. Overwrites the resource
@@ -87,7 +86,8 @@ router.delete("/api/users/:id", validateUserExistence, (req, res) => {
     res.status(200).send(findUser);
 })*/
 
-router.post("/api/auth", passport.authenticate("local"), (req, res) => {
+router.post("/api/login", passport.authenticate("local"), 
+    (req, res) => {
     res.sendStatus(200);
 })
 
