@@ -29,13 +29,16 @@ passport.serializeUser((user, done) => {
     done(null, user.id) // user.id is passed to the deserializeUser function
 })
 
-passport.deserializeUser((userId, done) => {
+passport.deserializeUser(async (userId, done) => {
     console.log("Inside deserializer");
     try {
         //attachs the validated user object to the request object
         // every time a request is made after the first request
-        const findUser = users.find(user => user.id === userId);
-        done(null, findUser);
+        
+        const { rows } = await pool.query(`
+                select * from users u where u.id = $1
+            `, [userId]);
+        done(null, rows[0]);
     } catch(err) {
         done(err, null);
     }
