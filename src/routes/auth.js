@@ -9,7 +9,7 @@ const pool = require("../database/db");
 
 const router = Router();
 
-router.post("/api/login", passport.authenticate("local"), 
+router.post("/api/login", passport.authenticate("local", {failWithError: false, failureMessage: false}), 
     (req, res) => {
     res.status(200).send("You have logged in!");
 })

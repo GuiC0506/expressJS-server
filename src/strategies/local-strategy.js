@@ -1,19 +1,21 @@
 const passport = require("passport");
 const { Strategy } = require("passport-local");
 const pool = require("../database/db");
+const { hashPassword, comparePassword } = require("../utils/helpers");
 
 passport.use(
     // called in every post request that handles authentication
     // for verifing if a user exists
     new Strategy(async (username, password, done) => {
         try {
-            const result = await pool.query(`select * from users u 
-                                        where u.name = $1 and u.password = $2`,
-                                        [username, password]
-                                    );
-            done(null, result.rows[0]); // calls the serializeUser function
+            const { rows: userRegisters, rowCount } = await pool.query(`select * from users where name = $1`, [username])
+            if(!rowCount) throw new Error("User does not exist.");
+            const { rows: hashedPassword } = await pool.query(`select name, password from users where name = $1`, [username]);
+            const isHashableEqualsPlain = await comparePassword(password, hashedPassword[0].password);
+            if(!isHashableEqualsPlain) throw new Error("Bad credentials");
+            done(null, userRegisters[0]); // calls the serializeUser function
         } catch(err) {
-            done(err, null, {message: "Not possible to authenticate"});
+            done(err, null, {message: err.message});
         }
     })
 )

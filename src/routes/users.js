@@ -12,7 +12,6 @@ const router = Router();
 
 // get a specific resource
 router.get("/api/users",
-    checkAuthentication,
     async (req, res) => {
         const { rows } = await pool.query(`select * from users;`);
         return res.status(200).json(rows);
@@ -62,9 +61,10 @@ router.put("/api/users/:id",
 // updates a resource partially. For example, a single field of a object.
 router.patch("/api/users/:id",
     checkAuthentication,
-    (req, res) => {
-    const { userIndex } = req;
-    users[userIndex] = { ...users[userIndex], ...req.body };
+    async (req, res) => {
+        const user = await pool.query(`
+            update users set 
+            `)
     return res.sendStatus(204);
 })
 
