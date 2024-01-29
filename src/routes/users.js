@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const  { query, validationResult, checkSchema, matchedData, check } = require('express-validator');
 const { users } = require("../utils/constants");
-const { validateUserExistence, requestLogger, checkAuthentication } = require("../middlewares");
+const { validateUserExistence, requestLogger, checkAuthentication, authenticateToken } = require("../middlewares");
 const { userCreationSchema } = require("../utils/validationSchemas");
 const passport = require('passport');
 const _ = require("../strategies/local-strategy");
@@ -12,13 +12,14 @@ const router = Router();
 
 // get a specific resource
 router.get("/api/users",
+    authenticateToken,
     async (req, res) => {
         const { rows } = await pool.query(`select * from users;`);
         return res.status(200).json(rows);
 });
 
 router.get("/api/users/:id",
-    checkAuthentication,
+    authenticateToken,
     async (req, res) => {
     const userId = req.params.id;
     try {
@@ -36,7 +37,7 @@ router.get("/api/users/:id",
 })
 // updates the whole resource, given a specific ID. Overwrites the resource
 router.put("/api/users/:id",
-    checkAuthentication,
+    authenticateToken,
     checkSchema(userCreationSchema),
     async (req, res) => {
     const { id: userId } = req.params;
@@ -60,7 +61,7 @@ router.put("/api/users/:id",
 
 // updates a resource partially. For example, a single field of a object.
 router.patch("/api/users/:id",
-    checkAuthentication,
+    authenticateToken,
     async (req, res) => {
         const user = await pool.query(`
             update users set 

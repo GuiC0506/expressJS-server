@@ -1,4 +1,5 @@
 const  { users } = require('./utils/constants');
+const jwt = require("jsonwebtoken");
 
 const validateUserExistence = (req, res, next) => {
     const userId = parseInt(req.params.id);
@@ -24,4 +25,18 @@ const checkAuthentication = (req, res, next) => {
     return req.isAuthenticated() ? next() : res.sendStatus(401);
 }
 
-module.exports = { validateUserExistence, requestLogger, checkAuthentication };
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if(token==null) return res.sendStatus(401);
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET,
+        (err, user) => {
+            if(err) return res.sendStatus(403).json({error: "Your token has expired"});
+            console.log("Verificando: ", user);
+            next();
+        }
+    );
+}
+
+module.exports = { validateUserExistence, requestLogger, checkAuthentication, authenticateToken };
