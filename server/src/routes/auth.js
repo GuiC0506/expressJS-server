@@ -39,6 +39,7 @@ router.post("/api/loginjwt",
             algorithm: "HS256",
             expiresIn: 3600
         });
+        res.cookie("jwt", accessToken);
         return res.status(200).json({ accessToken: accessToken });
     }
 )
@@ -76,7 +77,15 @@ router.post("/api/auth/logout", (req, res) => {
     })
 })
 
-router.get("/api/auth/status", middlewares.authenticateToken, 
+router.post("/api/auth/logoutjwt",
+    middlewares.authenticateToken,
+    (req, res) => {
+        res.clearCookie("jwt");
+        res.sendStatus(202);
+    }
+)
+
+router.get("/api/auth/status", middlewares.authenticateToken,
     (req, res) => {
     /* console.log(req.session) */
     /* req.sessionStore.get(req.sessionID, (err, session) => { */

@@ -26,14 +26,12 @@ const checkAuthentication = (req, res, next) => {
 }
 
 const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
-    if(token==null) return res.sendStatus(401);
+    const token = req.cookies && req.cookies.jwt;
+    if(token==null) return res.sendStatus(401).send("Invalid token");
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET,
         (err, user) => {
-            if(err) return res.sendStatus(403).json({error: "Your token has expired"});
-            console.log("Verificando: ", user);
+            if(err) return res.sendStatus(403);
             next();
         }
     );

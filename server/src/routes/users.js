@@ -12,7 +12,6 @@ const router = Router();
 
 // get a specific resource
 router.get("/api/users",
-    authenticateToken,
     async (req, res) => {
         const { rows } = await pool.query(`select * from users;`);
         return res.status(200).json(rows);
