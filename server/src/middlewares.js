@@ -31,6 +31,7 @@ const authenticateToken = (req, res, next) => {
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET,
         (err, user) => {
+            console.log("Tokenh validado");
             if(err) return res.sendStatus(403);
             next();
         }

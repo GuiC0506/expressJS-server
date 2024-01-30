@@ -24,9 +24,7 @@ router.post("/api/login", passport.authenticate("local", {failWithError: false, 
 router.post("/api/loginjwt",
     checkSchema(userCreationSchema),
     async (req, res) => {
-        console.log("aquyiiiiii")
         const { username, displayName, password } = req.body;
-        console.log("AQUI > ", req.body);
         const { rows: userRegisters, rowCount } = await pool.query(`select * from users where name = $1`, [username])
         if(!rowCount) return res.status(401).json({error: "User does not exist"});
         const { rows: hashedPassword } = await pool.query(`select name, password from users where name = $1`, [username]);
@@ -47,7 +45,7 @@ router.post("/api/loginjwt",
     }
 )
 
-router.post("/api/register", UserController.store)
+router.post("/api/register", UserController.store);
 
 router.post("/api/auth/logout", (req, res) => {
     if(!req.isAuthenticated()) return res.status(401).send("You have not made the login yet.");

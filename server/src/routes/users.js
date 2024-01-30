@@ -6,16 +6,13 @@ const { userCreationSchema } = require("../utils/validationSchemas");
 const passport = require('passport');
 const _ = require("../strategies/local-strategy");
 const pool = require("../database/db");
+const UserController = require('../controllers/UserController');
 
 // mini router aplication to group endpoints of a domain
 const router = Router();
 
 // get a specific resource
-router.get("/api/users",
-    async (req, res) => {
-        const { rows } = await pool.query(`select * from users;`);
-        return res.status(200).json(rows);
-});
+router.get("/api/users", authenticateToken, UserController.index);
 
 router.get("/api/users/:id",
     authenticateToken,

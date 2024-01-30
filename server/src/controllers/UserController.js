@@ -2,6 +2,11 @@ const User = require("../models/User");
 const { hashPassword } = require("../utils/helpers");
 
 module.exports = {
+    async index(req, res, next) {
+        const users = await User.findAll();
+        return res.status(200).json(users);
+    },
+
     async store(req, res, next) {
         try {
             const data = req.body
