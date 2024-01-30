@@ -6,6 +6,7 @@ const session = require("express-session");
 const passport = require("passport");
 const cors = require("cors");
 require("dotenv").config();
+require("./databaseV2");
 
 const app = express();
 const PORT = process.env.PORT || 3333;

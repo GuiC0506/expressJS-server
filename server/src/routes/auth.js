@@ -8,6 +8,7 @@ const pool = require("../database/db");
 const jwt = require("jsonwebtoken");
 const middlewares = require("../middlewares");
 const { users } = require("../utils/constants");
+const UserController = require("../controllers/UserController");
 require("dotenv").config();
 
 const router = Router();
@@ -23,6 +24,7 @@ router.post("/api/login", passport.authenticate("local", {failWithError: false, 
 router.post("/api/loginjwt",
     checkSchema(userCreationSchema),
     async (req, res) => {
+        console.log("aquyiiiiii")
         const { username, displayName, password } = req.body;
         console.log("AQUI > ", req.body);
         const { rows: userRegisters, rowCount } = await pool.query(`select * from users where name = $1`, [username])
@@ -45,30 +47,7 @@ router.post("/api/loginjwt",
     }
 )
 
-router.post("/api/register", 
-    checkSchema(userCreationSchema),
-    async (req, res) => {
-        const result = validationResult(req);
-        if(!result.isEmpty()) {
-            const erroMsg = {};
-            for(const err of result.array()) {
-                erroMsg[err.path] = err.msg;
-            }
-            return res.status(400).send(erroMsg);
-        }
-        const data = matchedData(req);
-        data.password = await hashPassword(data.password);
-        try {
-            const insertResult = await pool.query(`
-                    insert into users (name, display_name, password)
-                    values ($1, $2, $3)
-                `, [data.username, data.displayName, data.password]);
-            res.sendStatus(200);
-        } catch(err) {
-            res.status(400).send(err.message);
-        }
-    }
-)
+router.post("/api/register", UserController.store)
 
 router.post("/api/auth/logout", (req, res) => {
     if(!req.isAuthenticated()) return res.status(401).send("You have not made the login yet.");
