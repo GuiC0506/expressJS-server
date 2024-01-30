@@ -17,7 +17,6 @@ function App() {
             const response = await axios.post("http://localhost:3333/api/loginjwt", body,
                 {
                     headers: { "Content-Type":"application/json" },
-                    withCredentials: true
                 }
             );
             console.log(response.data);
