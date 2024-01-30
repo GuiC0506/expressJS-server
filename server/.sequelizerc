@@ -1,0 +1,6 @@
+const path = require("path");
+
+// config file for database configuration that sequelize-cli should look
+module.exports = {
+    config: path.resolve(__dirname, "src", "config", "database.js")
+}
