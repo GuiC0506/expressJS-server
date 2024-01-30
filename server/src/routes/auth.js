@@ -24,11 +24,12 @@ router.post("/api/loginjwt",
     checkSchema(userCreationSchema),
     async (req, res) => {
         const { username, displayName, password } = req.body;
+        console.log("AQUI > ", req.body);
         const { rows: userRegisters, rowCount } = await pool.query(`select * from users where name = $1`, [username])
-        if(!rowCount) res.status(401).json({error: "User does not exist"});
+        if(!rowCount) return res.status(401).json({error: "User does not exist"});
         const { rows: hashedPassword } = await pool.query(`select name, password from users where name = $1`, [username]);
         const isHashableEqualsPlain = await comparePassword(password, hashedPassword[0].password);
-        if(!isHashableEqualsPlain) res.status(401).json({error: "Bad credentials"});
+        if(!isHashableEqualsPlain) return res.status(401).json({error: "Bad credentials"});
             
         const jwtPayload = {
             id: userRegisters[0].id,
@@ -39,7 +40,7 @@ router.post("/api/loginjwt",
             algorithm: "HS256",
             expiresIn: 3600
         });
-        res.cookie("jwt", accessToken);
+        res.cookie("jwt", accessToken, {httpOnly: false});
         return res.status(200).json({ accessToken: accessToken });
     }
 )
