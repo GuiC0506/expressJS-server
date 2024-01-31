@@ -35,7 +35,7 @@ router.post("/api/loginjwt",
                 name: req.user.name
             }
 
-            const accessToken = jwt.sign(jwtPayload, "secret", {
+            const accessToken = jwt.sign(jwtPayload, process.env.ACCESS_TOKEN_SECRET, {
                 algorithm: "HS256",
                 expiresIn: 3600
             });

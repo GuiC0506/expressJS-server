@@ -27,11 +27,11 @@ const checkAuthentication = (req, res, next) => {
 
 const authenticateToken = (req, res, next) => {
     const token = req.cookies && req.cookies.jwt;
+    console.log(token);
     if(token==null) return res.sendStatus(401).send("Invalid token");
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET,
         (err, user) => {
-            console.log("Tokenh validado");
             if(err) return res.sendStatus(403);
             next();
         }
