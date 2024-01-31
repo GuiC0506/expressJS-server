@@ -9,6 +9,7 @@ const jwt = require("jsonwebtoken");
 const middlewares = require("../middlewares");
 const { users } = require("../utils/constants");
 const UserController = require("../controllers/UserController");
+const User = require("../models/User");
 require("dotenv").config();
 
 const router = Router();
@@ -22,26 +23,29 @@ router.post("/api/login", passport.authenticate("local", {failWithError: false, 
 
 // authorization via jwt: information about user is stored in the client, together with the token.
 router.post("/api/loginjwt",
-    checkSchema(userCreationSchema),
+    UserController._getByUsername,
     async (req, res) => {
-        const { username, displayName, password } = req.body;
-        const { rows: userRegisters, rowCount } = await pool.query(`select * from users where name = $1`, [username])
-        if(!rowCount) return res.status(401).json({error: "User does not exist"});
-        const { rows: hashedPassword } = await pool.query(`select name, password from users where name = $1`, [username]);
-        const isHashableEqualsPlain = await comparePassword(password, hashedPassword[0].password);
-        if(!isHashableEqualsPlain) return res.status(401).json({error: "Bad credentials"});
-            
-        const jwtPayload = {
-            id: userRegisters[0].id,
-            name: userRegisters[0].name
-        }
+        try {
+            const data = req.body;
+            const isHashableEqualsPlain = await comparePassword(data.password, req.user.password);
+            if(!isHashableEqualsPlain) return res.status(401).json({erro: "Bad credentials"});
 
-        const accessToken = jwt.sign(jwtPayload, process.env.ACCESS_TOKEN_SECRET, {
-            algorithm: "HS256",
-            expiresIn: 3600
-        });
-        res.cookie("jwt", accessToken, {httpOnly: false});
-        return res.status(200).json({ accessToken: accessToken });
+            const jwtPayload = {
+                id: req.user.id,
+                name: req.user.name
+            }
+
+            const accessToken = jwt.sign(jwtPayload, "secret", {
+                algorithm: "HS256",
+                expiresIn: 3600
+            });
+
+            res.cookie("jwt", accessToken, {httpOnly: false});
+            return res.status(200).json({ accessToken: accessToken });
+
+        } catch(err) {
+            console.log("TESTE");
+        }
     }
 )
 
