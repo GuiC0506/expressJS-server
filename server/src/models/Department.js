@@ -24,3 +24,5 @@ class Department extends Model {
         }, {sequelize: connection})
     }
 }
+
+module.exports = Department;

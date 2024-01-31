@@ -17,6 +17,15 @@ class User extends Model {
                     notNull: { msg: "Password must have a value" }
                 },
                 unique: true
+            },
+            dptm_id: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                validate: {
+                    notNull: {
+                        msg: "Field dptm_id (department_id) must not be empty"
+                    }
+                }
             }
         }, { sequelize: connection });
     }

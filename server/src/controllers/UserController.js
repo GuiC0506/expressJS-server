@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Department = require("../models/Department");
 const { hashPassword } = require("../utils/helpers");
 
 module.exports = {
@@ -19,13 +20,15 @@ module.exports = {
         try {
             const data = req.body
             data.password = data.password && await hashPassword(data?.password);
-            const { name, password } = data;
-            const user = await User.create({ name, password});
+            const { name, password, dptm_id } = data;
+            console.log(name, password, dptm_id);
+            const department = await Department.findByPk(dptm_id);
+            if(department===null) return res.status(404).json("Department does not exist");
+            const user = await User.create({ name, password, dptm_id});
             return res.status(200).json(user);
         } catch(err) {
-            console.log(err);
-            const validationErros = err.errors.map(err => ({ error: err.message }));
-            return res.status(400).json(validationErros);
+            /* const validationErros = err.errors.map(err => ({ error: err.message })); */
+            return res.status(400).json(err);
         }
     }
 }

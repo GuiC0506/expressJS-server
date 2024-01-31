@@ -6,7 +6,7 @@ const Department = require("../models/Department");
 const connection  = new Sequelize(dbConfig);
 
 User.init(connection);
-User.init(connection);
+Department.init(connection);
 
 module.exports = connection;
 
