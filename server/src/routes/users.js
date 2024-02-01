@@ -14,46 +14,8 @@ const router = Router();
 // get a specific resource
 router.get("/api/users", authenticateToken, UserController.index);
 
-router.get("/api/users/:id",
-    authenticateToken,
-    async (req, res) => {
-    const userId = req.params.id;
-    try {
-        const data = await pool.query(`
-            select * from users u where u.id = $1
-         `, [userId]);
-        if(data.rowCount) {
-            res.status(200).send(data.rows[0]);
-        } else {
-            throw new Error("User not found");
-        }
-    } catch(err) {
-        res.status(401).send({msg: err.message});
-    }
-})
+router.get("/api/users/:id", authenticateToken, UserController.getById);
 // updates the whole resource, given a specific ID. Overwrites the resource
-router.put("/api/users/:id",
-    authenticateToken,
-    checkSchema(userCreationSchema),
-    async (req, res) => {
-    const { id: userId } = req.params;
-    const { username, displayName, password } = req.body;
-    try {
-        const { rowCount } = await pool.query(`select * from users u where u.id = $1 `, [userId]);
-        if(!rowCount) return res.status(404).json({error: `User with ID ${userId} not found`});
-        const result = await pool.query(`
-            update users set
-                name = $1,
-                display_name = $2,
-                password = $3
-            where id = $4;
-            `, [username, displayName, password, userId]);
-        return res.status(200).send(`User was updated`);
-    } catch(err) {
-        return res.status(400).json({error: err.message});
-    }
-})
-
 
 // updates a resource partially. For example, a single field of a object.
 router.patch("/api/users/:id",

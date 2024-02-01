@@ -16,7 +16,14 @@ module.exports = {
         next();
     },
 
-    async store(req, res, next) {
+    async getById(req, res) {
+        const { id } = req.params;
+        const user = await User.findByPk(id);
+        if(!user) return res.status(400).json({error: "User not found"});
+        return res.status(200).json(user);
+    },
+
+    async store(req, res) {
         try {
             const data = req.body
             data.password = data.password && await hashPassword(data?.password);
@@ -26,8 +33,8 @@ module.exports = {
             const user = await User.create({ name, password, dptm_id});
             return res.status(200).json(user);
         } catch(err) {
-            const validationErros = err.errors.map(err => ({ error: err.message }));
-            return res.status(400).json(err);
+            const validationErrors = err.errors.map(err => ({ error: err.message }));
+            return res.status(400).json(validationErrors);
         }
     }
 }
