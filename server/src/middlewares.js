@@ -27,11 +27,11 @@ const checkAuthentication = (req, res, next) => {
 
 const authenticateToken = (req, res, next) => {
     const token = req.cookies && req.cookies.jwt;
-    if(token==null) return res.sendStatus(401).send("Invalid token");
+    if(token==null) return res.status(401).json({ error: "You are not logged in yet" });
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET,
         (err, user) => {
-            if(err) return res.sendStatus(403).json({ error: "You are not logged in"});
+            if(err) return res.status(403).json({ error: "Invalid token"});
             next();
         }
     );

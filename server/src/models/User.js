@@ -8,6 +8,9 @@ class User extends Model {
                 allowNull: false,
                 validate: {
                     notNull: { msg: "Name must have a value"},
+                },
+                unique: {
+                    msg: "Name already exists"
                 }
             },
             password: {

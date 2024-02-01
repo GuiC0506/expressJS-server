@@ -1,5 +1,4 @@
 const { hashPassword, comparePassword } = require("../utils/helpers");
-const pool = require("../database/db");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
@@ -18,10 +17,8 @@ module.exports = {
                 name: user.name
              }
 
-            const accessToken = jwt.sign(jwtPayload, process.env.ACCESS_TOKEN_SECRET, {
-                algorithm: "HS256",
-                expiresIn: 3600
-            });
+            const accessToken = jwt.sign(jwtPayload, 
+                process.env.ACCESS_TOKEN_SECRET, { expiresIn: 3600 });
 
             res.cookie("jwt", accessToken, {httpOnly: false});
             return res.status(200).json({ message: "Logged in!" });
@@ -33,6 +30,6 @@ module.exports = {
 
     async logout(req, res) {
         res.clearCookie("jwt");
-        res.sendStatus(202).json({ error: "Logged out!"});
+        res.status(202).json({ error: "Logged out!"});
     }
 }
