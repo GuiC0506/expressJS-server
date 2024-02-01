@@ -20,7 +20,14 @@ module.exports = {
         const { id } = req.params;
         const user = await User.findByPk(id);
         if(!user) return res.status(400).json({error: "User not found"});
-        return res.status(200).json(user);
+        return res.status(200).json({message: "Delete successfully"});
+    },
+
+    async delete(req, res) {
+        const { id } = req.params;
+        const user = await User.destroy({ where: { id } });
+        if(!user) return res.status(400).json({ error: "User not found" })
+        return res.sendStatus(200);
     },
 
     async store(req, res) {

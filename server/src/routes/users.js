@@ -11,15 +11,9 @@ const UserController = require('../controllers/UserController');
 // mini router aplication to group endpoints of a domain
 const router = Router();
 
-// get a specific resource
 router.get("/api/users", authenticateToken, UserController.index);
-
 router.get("/api/users/:id", authenticateToken, UserController.getById);
-// updates the whole resource, given a specific ID. Overwrites the resource
-
-// updates a resource partially. For example, a single field of a object.
-router.patch("/api/users/:id",
-    authenticateToken,
+router.patch("/api/users/:id", authenticateToken,
     async (req, res) => {
         const user = await pool.query(`
             update users set 
@@ -28,11 +22,7 @@ router.patch("/api/users/:id",
 })
 
 // deletes a specific resource, given a ID
-router.delete("/api/users/:id", validateUserExistence, (req, res) => {
-    const { userIndex } = req;
-    users.splice(userIndex, 1);
-    return res.sendStatus(200);
-})
+router.delete("/api/users/:id", authenticateToken, UserController.delete);
 
 router.post("/api/cart", (req, res) => {
     if(!req.session.user) return res.sendStatus(401);
