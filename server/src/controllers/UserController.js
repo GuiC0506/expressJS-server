@@ -8,19 +8,16 @@ module.exports = {
         return res.status(200).json(users);
     },
     
-    async _getByUsername(req, res, next) {
-        const { name } = req.body;
-        const user = await User.findOne({where: { name }});
-        if(!user) return res.status(400).send("User not found");
-        req.user = user;
-        next();
-    },
-
     async getById(req, res) {
         const { id } = req.params;
         const user = await User.findByPk(id);
         if(!user) return res.status(400).json({error: "User not found"});
         return res.status(200).json({message: "Delete successfully"});
+    },
+
+    async edit(req, res) {
+        const [ field, value ] = Object.entries(field);
+        return res.send([field, value]);
     },
 
     async delete(req, res) {
