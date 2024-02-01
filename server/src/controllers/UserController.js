@@ -21,13 +21,12 @@ module.exports = {
             const data = req.body
             data.password = data.password && await hashPassword(data?.password);
             const { name, password, dptm_id } = data;
-            console.log(name, password, dptm_id);
             const department = await Department.findByPk(dptm_id);
-            if(department===null) return res.status(404).json("Department does not exist");
+            if(!department) return res.status(404).json({error: "Department does not exist"});
             const user = await User.create({ name, password, dptm_id});
             return res.status(200).json(user);
         } catch(err) {
-            /* const validationErros = err.errors.map(err => ({ error: err.message })); */
+            const validationErros = err.errors.map(err => ({ error: err.message }));
             return res.status(400).json(err);
         }
     }
