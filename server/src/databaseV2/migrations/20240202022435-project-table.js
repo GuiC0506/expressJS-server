@@ -22,7 +22,7 @@ module.exports = {
             references: {
                 model: "users",
                 key: "id"
-            }
+            },
         },
 
         created_at: {
