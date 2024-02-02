@@ -21,7 +21,7 @@ class User extends Model {
                 },
                 unique: true
             },
-            dptm_id: {
+            department_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 validate: {
@@ -31,6 +31,10 @@ class User extends Model {
                 }
             }
         }, { sequelize: connection });
+    };
+
+    static associate(models) {
+        this.belongsTo(models.Department, {foreignKey: "department_id", as: "belongs"}); // foreign key goes to on the source
     }
 }
 
