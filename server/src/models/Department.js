@@ -23,6 +23,10 @@ class Department extends Model {
             }
         }, {sequelize: connection})
     }
+
+    static associate(models) {
+        this.hasMany(models.User, {foreignKey: "department_id", as: "contains"});
+    }
 }
 
 module.exports = Department;
