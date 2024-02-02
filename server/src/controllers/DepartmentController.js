@@ -19,5 +19,16 @@ module.exports = {
         } catch(err) {
             return res.json(err);
         }
+    },
+
+    async delete(req, res) {
+        try {
+            const { id } = req.params;
+            const department = await Department.destroy({where: { id }});
+            if(!department) return res.status(400).json({ error: `Deparment with id ${id} does not exist`});
+            return res.status(200).send({ message: "Department deleted"});
+        } catch(err) {
+            return res.statusCode(500);
+        }
     }
 }

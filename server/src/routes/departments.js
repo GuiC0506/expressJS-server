@@ -7,6 +7,7 @@ const router = Router();
 
 router.get("/api/departments", DepartmentController.index);
 router.post("/api/departments", DepartmentController.store);
+router.delete("/api/departments/:id", DepartmentController.delete);
 
 
 module.exports = router;
