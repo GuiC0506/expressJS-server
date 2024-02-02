@@ -20,6 +20,14 @@ module.exports = {
         return res.send([field, value]);
     },
 
+    async usersByDepartment(req, res) {
+        const { department_id } = req.params;
+        const department = await Department.findByPk(department_id);
+        if(!department) return res.status(400).json({ error: `Department with id ${department_id} does not exist`})
+        const users = await User.findAll({where: { department_id } });
+        return res.status(200).json(users);
+    },
+
     async delete(req, res) {
         const { id } = req.params;
         const user = await User.destroy({ where: { id } });

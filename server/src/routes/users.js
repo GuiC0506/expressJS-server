@@ -11,6 +11,7 @@ router.get("/api/users", authenticateToken, UserController.index);
 router.get("/api/users/:id", authenticateToken, UserController.getById);
 router.patch("/api/users/:id", authenticateToken, UserController.edit);
 router.delete("/api/users/:id", authenticateToken, UserController.delete);
-router.post("/api/register", UserController.store);
+router.post("/api/register/:department_id", UserController.store);
+router.get("/api/users/:department_id/departments", authenticateToken, UserController.usersByDepartment);
 
 module.exports.userRoutes = router;
