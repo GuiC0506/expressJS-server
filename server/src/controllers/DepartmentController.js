@@ -17,7 +17,8 @@ module.exports = {
             const department = await Department.create({name, owner})
             return res.status(200).json(department);
         } catch(err) {
-            return res.json(err);
+            const validationErrors = err.errors.map(error => ({erro: error.message}));
+            return res.status(400).json(validationErrors);
         }
     },
 
