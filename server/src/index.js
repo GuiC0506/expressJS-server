@@ -1,5 +1,5 @@
 const express = require("express");
-const { router } = require("./routes/index");
+const router = require("./routes/index");
 const { requestLogger, checkAuthentication, authenticateToken } = require("./middlewares");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");

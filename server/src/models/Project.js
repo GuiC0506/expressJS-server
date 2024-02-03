@@ -22,3 +22,5 @@ class Project extends Model {
     static associate(models) {
         this.belongsToMany(models.User, { foreignKey: "project_id", through: "user_projects", as:"users"}) }
 }
+
+module.exports = Project;
