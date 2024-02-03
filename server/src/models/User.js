@@ -35,6 +35,7 @@ class User extends Model {
 
     static associate(models) {
         this.belongsTo(models.Department, {foreignKey: "department_id", as: "belongs"}); // foreign key goes to on the source
+        this.belongsToMany(models.Project, { foreignKey: "user_id", through: "user_projects", as:"projects"})
     }
 }
 
